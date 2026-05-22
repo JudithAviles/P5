@@ -8,7 +8,7 @@
 using namespace upc;
 using namespace std;
 
-InstrumentDumb::InstrumentPlano(const std::string &param) 
+InstrumentPlano::InstrumentPlano(const std::string &param) 
   : adsr(SamplingRate, param) {
   bActive = false;
   x.resize(BSIZE);

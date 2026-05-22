@@ -8,7 +8,7 @@
 using namespace upc;
 using namespace std;
 
-InstrumentDumb::InstrumentPerc(const std::string &param) 
+InstrumentPerc::InstrumentPerc(const std::string &param) 
   : adsr(SamplingRate, param) {
   bActive = false;
   x.resize(BSIZE);

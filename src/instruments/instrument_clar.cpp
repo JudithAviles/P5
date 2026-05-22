@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "instrument_seno.h"
+#include "instrument_clar.h"
 #include "keyvalue.h"
 
 #include <stdlib.h>
@@ -8,7 +8,7 @@
 using namespace upc;
 using namespace std;
 
-InstrumentSeno::InstrumentSeno(const std::string &param) 
+InstrumentClar::InstrumentClar(const std::string &param) 
   : adsr(SamplingRate, param) {
   bActive = false;
   x.resize(BSIZE);
@@ -35,7 +35,7 @@ InstrumentSeno::InstrumentSeno(const std::string &param)
 }
 
 
-void InstrumentSeno::command(long cmd, long note, long vel) {
+void InstrumentClar::command(long cmd, long note, long vel) {
   if (cmd == 9) {		//'Key' pressed: attack begins
     bActive = true;
     adsr.start();
@@ -56,7 +56,7 @@ void InstrumentSeno::command(long cmd, long note, long vel) {
 }
 
 
-const vector<float> & InstrumentSeno::synthesize() {
+const vector<float> & InstrumentClar::synthesize() {
   if (not adsr.active()) {
     x.assign(x.size(), 0);
     bActive = false;
