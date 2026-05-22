@@ -43,6 +43,8 @@ permitan visualizar el funcionamiento de la curva ADSR.
 ![ADSR Percussió finalitzada](ADSR_perc_acabada.png)
 ![ADSR Flauta](ADSR_flauta.png)
 
+Falta etiquetar!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 Para los cuatro casos, deberá incluir una gráfica en la que se visualice claramente la curva ADSR. Deberá
 añadir la información necesaria para su correcta interpretación, aunque esa información puede reducirse a
 colocar etiquetas y títulos adecuados en la propia gráfica (se valorará positivamente esta alternativa).
