@@ -38,6 +38,11 @@ permitan visualizar el funcionamiento de la curva ADSR.
   ellos, el ataque es relativamente rápido hasta alcanzar el nivel de mantenimiento (sin sobrecarga), y la
   liberación también es bastante rápida.
 
+![ADSR Genèrica](ADSR_clar.png)
+![ADSR Percussió pulsada](ADSR_perc_sostinguda.png)
+![ADSR Percussió finalitzada](ADSR_perc_acabada.png)
+![ADSR Flauta](ADSR_flauta.png)
+
 Para los cuatro casos, deberá incluir una gráfica en la que se visualice claramente la curva ADSR. Deberá
 añadir la información necesaria para su correcta interpretación, aunque esa información puede reducirse a
 colocar etiquetas y títulos adecuados en la propia gráfica (se valorará positivamente esta alternativa).
