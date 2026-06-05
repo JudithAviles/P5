@@ -25,32 +25,29 @@ InstrumentSeno::InstrumentSeno(const std::string &param)
     N = 40; //default value
   
   //Create a tbl with one period of a sinusoidal wave
-  // Si en vez de utilizar un sinusoide utilizamos una función de sierra o otras conseguimos diferentes efectos
   tbl.resize(N);
-  float phase = 0, step = 2 * M_PI /(float) N;
+  phase = 0;
+  float step = 2 * M_PI / (float) N;
   for (int i=0; i < N ; ++i) {
     tbl[i] = sin(phase);
     phase += step;
   }
+  phase = 0;
 }
 
 
 void InstrumentSeno::command(long cmd, long note, long vel) {
-  if (cmd == 9) {		//'Key' pressed: attack begins
+  if (cmd == 9) {
     bActive = true;
     adsr.start();
-    // Indicamos como queremos que recorra la tabla --> Que nota debe tocar
-    // Por ahora, para frecuencias múltiples decimales (no coincide exactamente con las muestras que tenemos en la tabla)
-    // Utilizaremos la muestra más cercana a la que relamente queremos
-    // Para mejorar el código podríamos interpolar para obtener una mejor muestra
-	  A = vel / 127.;
-    //this->phase = 0;
+    A = vel / 127.;
+    phase = 0;
     this->step = 440*pow(2, (note-69)/12.)*tbl.size()/SamplingRate;
   }
-  else if (cmd == 8) {	//'Key' released: sustain ends, release begins
+  else if (cmd == 8) {
     adsr.stop();
   }
-  else if (cmd == 0) {	//Sound extinguished without waiting for release to end
+  else if (cmd == 0) {
     adsr.end();
   }
 }
@@ -66,13 +63,17 @@ const vector<float> & InstrumentSeno::synthesize() {
     return x;
 
   for (unsigned int i=0; i<x.size(); ++i) {
-    x[i] = A * tbl[(int) phase+0.5];
+    unsigned int idx0 = (unsigned int) phase;
+    unsigned int idx1 = idx0 + 1;
+    if (idx1 >= tbl.size())
+      idx1 = 0;
+    float frac = phase - idx0;
+    x[i] = A * (tbl[idx0] + frac * (tbl[idx1] - tbl[idx0]));
     phase += step;
-    while(phase >= tbl.size()-0.5){
+    while (phase >= tbl.size())
       phase -= tbl.size();
-    }
   }
-  adsr(x); //apply envelope to x and update internal status of ADSR
+  adsr(x);
 
   return x;
 }

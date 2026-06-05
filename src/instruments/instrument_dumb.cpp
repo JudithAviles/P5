@@ -25,13 +25,14 @@ InstrumentDumb::InstrumentDumb(const std::string &param)
     N = 40; //default value
   
   //Create a tbl with one period of a sinusoidal wave
-  // Si en vez de utilizar un sinusoide utilizamos una función de sierra o otras conseguimos diferentes efectos
   tbl.resize(N);
-  float phase = 0, step = 2 * M_PI /(float) N;
+  phase = 0;
+  float step = 2 * M_PI / (float) N;
   for (int i=0; i < N ; ++i) {
     tbl[i] = sin(phase);
     phase += step;
   }
+  phase = 0;
 }
 
 
@@ -44,7 +45,7 @@ void InstrumentDumb::command(long cmd, long note, long vel) {
     // Utilizaremos la muestra más cercana a la que relamente queremos
     // Para mejorar el código podríamos interpolar para obtener una mejor muestra
 	  A = vel / 127.;
-    //this->phase = 0;
+    phase = 0;
     this->step = 440*pow(2, (note-69)/12.)*tbl.size()/SamplingRate;
   }
   else if (cmd == 8) {	//'Key' released: sustain ends, release begins

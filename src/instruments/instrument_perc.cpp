@@ -20,11 +20,13 @@ InstrumentPerc::InstrumentPerc(const std::string &param)
     N = 40;
   
   tbl.resize(N);
-  float phase = 0, step = 2 * M_PI /(float) N;
+  phase = 0;
+  float step = 2 * M_PI / (float) N;
   for (int i=0; i < N ; ++i) {
     tbl[i] = sin(phase);
     phase += step;
   }
+  phase = 0;
 }
 
 
@@ -33,6 +35,7 @@ void InstrumentPerc::command(long cmd, long note, long vel) {
     bActive = true;
     adsr.start();
 	  A = vel / 127.;
+    phase = 0;
     this->step = 440*pow(2, (note-69)/12.)*tbl.size()/SamplingRate;
   }
   else if (cmd == 8) {
