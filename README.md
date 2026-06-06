@@ -55,6 +55,11 @@ Los ficheros de configuración utilizados son:
 
 ![Curvas ADSR de los cuatro instrumentos](work/adsr_envelopes.png)
 
+![ADSR Genèrica](ADSR_clar.png)
+![ADSR Percussió pulsada](ADSR_perc_sostinguda.png)
+![ADSR Percussió finalitzada](ADSR_perc_acabada.png)
+![ADSR Flauta](ADSR_flauta.png)
+
 **Interpretación de las gráficas:**
 
 1. **ADSR Genérica (InstrumentClar):** Se aprecian claramente las cuatro fases. Tras el

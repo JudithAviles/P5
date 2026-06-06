@@ -8,6 +8,7 @@
 using namespace upc;
 using namespace std;
 
+//param = cadena de parametros del instrument
 InstrumentDumb::InstrumentDumb(const std::string &param) 
   : adsr(SamplingRate, param) {
   bActive = false;
