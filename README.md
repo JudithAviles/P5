@@ -193,8 +193,66 @@ Parámetros configurables desde el fichero `effects`:
 
 **Ficheros de prueba:**
 
-- `work/effects.orc`: define un trémolo (efecto 1, A=0.10, fm=12 Hz)
-- `work/doremi.sco` (modificado): escala diatónica con control de efectos
+- `work/effects_tremolo.orc`: define trémolo (efecto 1, A=0.5, fm=5 Hz)
+- `work/effects_vibrato.orc`: define vibrato (efecto 1, I=1 semitono, fm=5 Hz)
+- `work/tremolo_test.sco`: nota A4 sostenida ~3 s; trémolo activo entre t≈1 s y t≈2 s
+- `work/vibrato_test.sco`: nota A4 sostenida ~3 s; vibrato activo entre t≈1 s y t≈2 s
+- `work/tremolo_doremi.sco`: escala diatónica C4–C5 con trémolo permanente
+- `work/vibrato_doremi.sco`: escala diatónica C4–C5 con vibrato permanente
+
+**Gráficas:**
+
+![Trémolo: modulación de amplitud](work/tremolo_effect.png)
+
+La gráfica superior muestra la señal portadora (440 Hz, A4) modulada en amplitud
+por un trémolo con A=0.5 y fm=5 Hz. La envolvente (línea roja discontinua)
+sigue la variación periódica `(1 + A·cos(2π·fm·t))/(1 + A)` que escala la
+amplitud instantánea. En la gráfica inferior se superpone la señal sin trémolo
+para apreciar el efecto sobre la amplitud.
+
+![Vibrato: modulación de frecuencia](work/vibrato_effect.png)
+
+La gráfica superior compara la señal con y sin vibrato (I=1 semitono, fm=5 Hz).
+El desplazamiento de fase relativo evidencia la fluctuación periódica de la
+frecuencia instantánea. La gráfica inferior muestra la frecuencia instantánea
+oscilando alrededor de la frecuencia base (440 Hz) con una desviación de
+aproximadamente ±20 Hz.
+
+**Generación de las señales de prueba:**
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.sh
+# Nota sostenida con trémolo (activo en la parte central)
+synth -e work/effects_tremolo.orc work/seno.orc work/tremolo_test.sco work/tremolo_test.wav
+
+# Nota sostenida con vibrato (activo en la parte central)
+synth -e work/effects_vibrato.orc work/seno.orc work/vibrato_test.sco work/vibrato_test.wav
+
+# Escala diatónica con trémolo
+synth -e work/effects_tremolo.orc work/seno.orc work/tremolo_doremi.sco work/tremolo_doremi.wav
+
+# Escala diatónica con vibrato
+synth -e work/effects_vibrato.orc work/seno.orc work/vibrato_doremi.sco work/vibrato_doremi.wav
+
+# Regenerar las gráficas
+python3 work/gen_effects_plot.py
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Estructura de control de efectos desde el score (.sco):**
+
+Los efectos se activan y desactivan mediante el evento 12:
+
+    ticks  12  channel  effect_number  command
+
+- `command = 0`: elimina el efecto del canal
+- `command ≠ 0`: asigna el efecto al canal y ejecuta `effect->command(command)`
+
+Por ejemplo, en `tremolo_test.sco`:
+```
+0    9    1    69    100     # NoteOn A4
+240  12   1    1     1       # Activar trémolo (t≈1 s)
+240  12   1    1     0       # Desactivar trémolo (t≈2 s)
+240  8    1    69    100     # NoteOff
+```
 
 ### Síntesis FM.
 
