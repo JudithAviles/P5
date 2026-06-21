@@ -1,5 +1,8 @@
 #include <iostream>
 #include "instrument_dumb.h"
+#include "instrument_clar.h"
+#include "instrument_perc.h"
+#include "instrument_plano.h"
 #include "instrument_seno.h"
 
 /*
@@ -18,6 +21,12 @@ namespace upc {
     //    cout << name << ": " << parameters << endl;
     if (name == "InstrumentDumb") {
       pInst = (Instrument *) new InstrumentDumb(parameters);
+    } else if (name == "InstrumentClar") {
+      pInst = (Instrument *) new InstrumentClar(parameters);
+    } else if (name == "InstrumentPerc") {
+      pInst = (Instrument *) new InstrumentPerc(parameters);
+    } else if (name == "InstrumentPlano") {
+      pInst = (Instrument *) new InstrumentPlano(parameters);
     } else if (name == "InstrumentSeno") {
       pInst = (Instrument *) new InstrumentSeno(parameters);
     }

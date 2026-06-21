@@ -75,12 +75,12 @@ const std::vector<float> & InstrumentMN::synthesize() {
     }
   }
 
-  /*  
+  
   //Normalize amplitudes
   if (n_active > 1) {
     for (unsigned n = 0; n < x.size(); ++n)
       x[n] = x[n]/ (float) n_active;
   }
-  */
+
   return x;
 }
