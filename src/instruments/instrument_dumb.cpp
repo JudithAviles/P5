@@ -69,13 +69,13 @@ const vector<float> & InstrumentDumb::synthesize() {
 
   // Para mejorar el código podríamos interpolar para obtener una mejor muestra
   for (unsigned int i=0; i<x.size(); ++i) {
-    //x[i] = A * tbl[(int) (phase+0.5)];
-    float fact = phase - (int) phase;
+    x[i] = A * tbl[(int) (phase+0.5)];
+    /*float fact = phase - (int) phase;
     if (ceil(phase) > tbl.size() || floor(phase) == tbl.size()){
       x[i] = A * ((1-fact)*tbl[floor(phase)]+fact*tbl[0]);
     } else{
       x[i] = A * ((1-fact)*tbl[floor(phase)]+fact*tbl[ceil(phase)]);
-    }
+    }*/
     phase += step;
     while(phase >= tbl.size()-0.5){
       phase -= tbl.size();

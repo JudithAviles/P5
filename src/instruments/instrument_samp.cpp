@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "instrument_ext.h"
+#include "instrument_samp.h"
 #include "keyvalue.h"
 
 #include <stdlib.h>
@@ -9,7 +9,7 @@ using namespace upc;
 using namespace std;
 
 //param = cadena de parametros del instrument
-InstrumentExt::InstrumentExt(const std::string &param) 
+InstrumentSamp::InstrumentSamp(const std::string &param) 
   : adsr(SamplingRate, param) {
   bActive = false;
   x.resize(BSIZE);
@@ -18,7 +18,7 @@ InstrumentExt::InstrumentExt(const std::string &param)
     You can use the class keyvalue to parse "param" and configure your instrument.
     Take a Look at keyvalue.h    
   */
-  // Cambiar file_name a nombre del archivo con la tabla externa
+  // Requiere obtener un fichero wav con grabación de una nota entera
   std::string file_name = "Ext_table.wav";
   static string kv_null;
   if((file_name = kv("file")) == kv_null) {
@@ -34,24 +34,25 @@ InstrumentExt::InstrumentExt(const std::string &param)
 }
 
 
-void InstrumentExt::command(long cmd, long note, long vel) {
+void InstrumentSamp::command(long cmd, long note, long vel) {
   if (cmd == 9) {		//'Key' pressed: attack begins
     bActive = true;
     adsr.start();
-    A = vel / 127.;
-    phase = 0;
-    this->step = 440*pow(2, (note-69)/12.)*tbl.size()/SamplingRate;
+    // Recorremos la tabla muestra a muestra independientemente del pitch (percussión) (sampler)
+    // Para instrumentos melódicos deberíamos mirar como hacer para cambiar el pitch de la ntoa según la que ya se tiene o tener más de una tabla
+    this->phase = 0;
+    this->step = 1;
   }
   else if (cmd == 8) {	//'Key' released: sustain ends, release begins
-    adsr.stop();
+    // Sin efecto, el final de la nota se produce cuando llegamos al final de la tabla
   }
   else if (cmd == 0) {	//Sound extinguished without waiting for release to end
-    adsr.end();
+    // Sin efecto, el final de la nota se produce cuando llegamos al final de la tabla
   }
 }
 
 
-const vector<float> & InstrumentExt::synthesize() {
+const vector<float> & InstrumentSamp::synthesize() {
   if (not adsr.active()) {
     x.assign(x.size(), 0);
     bActive = false;

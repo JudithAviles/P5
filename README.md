@@ -17,14 +17,14 @@ los ficheros entregados deberán estar en condiciones de ser ejecutados con sól
 A modo de memoria de la práctica, complete, en este mismo documento y usando el formato *markdown*, los
 ejercicios indicados.
 
-Ejercicios.
+Ejercicios
 -----------
 
-### Envolvente ADSR.
+### Envolvente ADSR
 
-Se han creado cuatro instrumentos que implementan la envolvente ADSR, todos ellos clonando
-`InstrumentDumb` pero con distintos parámetros y nombres de clase. Cada instrumento hereda
-de `Instrument` y utiliza `EnvelopeADSR` para la generación de la envolvente temporal.
+Se han creado cuatro instrumentos que implementan la envolvente ADSR, todos ellos utilizando la base
+`InstrumentSeno` pero con distintos parámetros. Cada instrumento hereda
+de `Instrument` y utiliza `EnvelopeADSR` para la generación de la envolvente temporal, y utiliza interpolación lineal para calcular el valor de la muestra.
 
 | Instrumento | ADSR_A | ADSR_D | ADSR_S | ADSR_R | Descripción |
 |-------------|--------|--------|--------|--------|-------------|
@@ -49,15 +49,23 @@ n_released = (int)(0.5 + t_release * SamplingRate);
 
 Los ficheros de configuración utilizados son:
 
-- `work/clar.orc`: `1  InstrumentClar  ADSR_A=0.1; ADSR_D=0.3; ADSR_S=0.5; ADSR_R=0.4; N=40;`
-- `work/perc.orc`: `1  InstrumentPerc  ADSR_A=0.001; ADSR_D=0.5; ADSR_S=0; ADSR_R=1.0; N=40;`
-- `work/plano.orc`: `1  InstrumentPlano  ADSR_A=0.01; ADSR_D=0; ADSR_S=0.8; ADSR_R=0.05; N=40;`
+- `work/clar.orc`: `1  InstrumentSeno  ADSR_A=0.1; ADSR_D=0.3; ADSR_S=0.5; ADSR_R=0.4; N=40;`
+- `work/perc.orc`: `1  InstrumentSeno  ADSR_A=0.001; ADSR_D=0.5; ADSR_S=0; ADSR_R=1.0; N=40;`
+- `work/plano.orc`: `1  InstrumentSeno  ADSR_A=0.01; ADSR_D=0; ADSR_S=0.8; ADSR_R=0.05; N=40;`
 
+**Curvas ADSR de los cuatro instrumentos**
 ![Curvas ADSR de los cuatro instrumentos](work/adsr_envelopes.png)
 
+**ADSR Genérica**
 ![ADSR Genèrica](ADSR_clar.png)
+
+**ADSR Percusión pulsada**
 ![ADSR Percussió pulsada](ADSR_perc_sostinguda.png)
+
+**ADSR Percusión finalizada**
 ![ADSR Percussió finalitzada](ADSR_perc_acabada.png)
+
+**ADSR Flauta**
 ![ADSR Flauta](ADSR_flauta.png)
 
 **Interpretación de las gráficas:**
