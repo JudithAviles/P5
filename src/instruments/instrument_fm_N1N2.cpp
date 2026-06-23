@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "instrument_fmN1N2.h"
+#include "instrument_fm_N1N2.h"
 #include "keyvalue.h"
 
 #include <stdlib.h>
@@ -8,15 +8,10 @@
 using namespace upc;
 using namespace std;
 
-InstrumentFMN1N2::InstrumentFMN1N2(const std::string &param) 
+InstrumentFM_N1N2::InstrumentFM_N1N2(const std::string &param) 
   : adsr(SamplingRate, param) {
   bActive = false;
   x.resize(BSIZE);
-
-  /*
-    You can use the class keyvalue to parse "param" and configure your instrument.
-    Take a Look at keyvalue.h    
-  */
   KeyValue kv(param);
 
   if (!kv.to_float("I",I))
@@ -25,23 +20,10 @@ InstrumentFMN1N2::InstrumentFMN1N2(const std::string &param)
     N1 = 1; //default value
   if (!kv.to_float("N2",N2))
     N2 = 1; //default value
-
-  // modulating freq fm
-  // d deviation, d = N1*fm = (N2-N1)*fm
-  
-  //Create a tbl with one period of a sinusoidal wave
-  /*tbl.resize(N);
-  phase = 0;
-  float step = 2 * M_PI / (float) N;
-  for (int i=0; i < N ; ++i) {
-    tbl[i] = sin(phase);
-    phase += step;
-  }
-  phase = 0;*/
 }
 
 
-void InstrumentFMN1N2::command(long cmd, long note, long vel) {
+void InstrumentFM_N1N2::command(long cmd, long note, long vel) {
   if (cmd == 9) {
     bActive = true;
     adsr.start();
@@ -50,8 +32,8 @@ void InstrumentFMN1N2::command(long cmd, long note, long vel) {
     phase1 = 0;
     phase2 = 0;
     float f0 = 440*pow(2, (note-69)/12.)/SamplingRate;
-    step1 = 2*M_PI*f0; //carrier frequency step in rad/s
-    step2 = 2*M_PI*fm/SamplingRate; //modulation frequency step in rad/s
+    step1 = 2*M_PI*f0*N1; //carrier frequency step in rad/s
+    step2 = 2*M_PI*f0*N2; //modulation frequency step in rad/s
   }
   else if (cmd == 8) {
     adsr.stop();
@@ -62,7 +44,7 @@ void InstrumentFMN1N2::command(long cmd, long note, long vel) {
 }
 
 
-const vector<float> & InstrumentFMN1N2::synthesize() {
+const vector<float> & InstrumentFM_N1N2::synthesize() {
   if (not adsr.active()) {
     x.assign(x.size(), 0);
     bActive = false;

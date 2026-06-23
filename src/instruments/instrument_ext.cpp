@@ -2,6 +2,7 @@
 #include <math.h>
 #include "instrument_ext.h"
 #include "keyvalue.h"
+#include "wavfile_mono.h"
 
 #include <stdlib.h>
 
@@ -19,7 +20,8 @@ InstrumentExt::InstrumentExt(const std::string &param)
     Take a Look at keyvalue.h    
   */
   // Cambiar file_name a nombre del archivo con la tabla externa
-  std::string file_name = "Ext_table.wav";
+  KeyValue kv(param);
+  std::string file_name = "Ext_table.wav"; //Default value
   static string kv_null;
   if((file_name = kv("file")) == kv_null) {
     cerr << "Error: no se ha encontrado el campo con el fichero de la señal para un instrumento FicTabla" << endl;

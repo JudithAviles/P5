@@ -23,19 +23,6 @@ InstrumentFM::InstrumentFM(const std::string &param)
     I = 1; //default value
   if (!kv.to_float("fm",fm))
     fm = 100; //default value
-
-  // modulating freq fm
-  // d deviation, d = N1*fm = (N2-N1)*fm
-  
-  //Create a tbl with one period of a sinusoidal wave
-  /*tbl.resize(N);
-  phase = 0;
-  float step = 2 * M_PI / (float) N;
-  for (int i=0; i < N ; ++i) {
-    tbl[i] = sin(phase);
-    phase += step;
-  }
-  phase = 0;*/
 }
 
 

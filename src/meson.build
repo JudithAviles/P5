@@ -8,6 +8,7 @@ sources = [
 	'instruments/instrument_ext.cpp',
 	'instruments/instrument_samp.cpp',
 	'instruments/instrument_fm.cpp',
+	'instruments/instrument_fm_N1N2.cpp',
 	'synth/envelope_adsr.cpp',
 	'synth/midi_score.cpp',
 	'synth/multinote_instr.cpp',
