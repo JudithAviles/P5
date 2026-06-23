@@ -54,8 +54,9 @@ const vector<float> & InstrumentFM_N1N2::synthesize() {
   else if (not bActive)
     return x;
 
+  float I_lin = 1 - pow(2,(-I/12));
   for (unsigned int i=0; i<x.size(); ++i) {
-    x[i] = amp * A * sin(phase1 + I*sin(phase2));
+    x[i] = amp * A * sin(phase1 + I_lin*sin(phase2));
     phase1 += step1;
     phase2 += step2;
     while(phase1 >= M_PI){

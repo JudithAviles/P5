@@ -69,7 +69,6 @@ void InstrumentSamp::command(long cmd, long note, long vel) {
     adsr.start();
     A = vel / 127.;
     // Recorremos la tabla muestra a muestra independientemente del pitch (percussión) (sampler)
-    // Para instrumentos melódicos deberíamos mirar como hacer para cambiar el pitch de la nota según la que ya se tiene o tener más de una tabla
     this->phase = 0;
     if(melodic == 0){
       this->step = 1;

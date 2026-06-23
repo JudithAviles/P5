@@ -164,7 +164,7 @@ synth seno.orc seno_doremi.sco work/seno_doremi.wav    # Escala de do
 synth seno.orc doremi.sco work/seno_doremi2.wav         # Escala con InstrumentSeno
 ~~~~~~
 
-### Efectos sonoros.
+### Efectos sonoros
 
 Se han implementado dos efectos: **trémolo** (modulación de amplitud) y **vibrato** (modulación de
 frecuencia). Ambos heredan de la clase base `Effect` y se registran en la factoría
@@ -262,7 +262,65 @@ Por ejemplo, en `tremolo_test.sco`:
 240  8    1    69    100     # NoteOff
 ```
 
-### Síntesis FM.
+### Síntesis por tabla externa y por sampler
+
+Se han implementado los instrumentos `InstrumentExt` y `InstrumentSamp` partiendo de `InstrumentSeno`. `InstrumentExt` utiliza una tabla externa de valores para su tabla de ondas, y mantiene el resto del proceso de sintetización igual a `InstrumentSeno`. La tabla exterior utilizada modela un periodo de un seno de frecuéncia 1 Hz y amplitud 1, a partir del cual se puede fácilmente sintetizar cualquier nota con los cálculos empleados previamente en `InstrumentSeno`.
+
+Para obtener la información del fichero dado:
+
+~~~~~~{.cpp}
+KeyValue kv(param);
+static string kv_null;
+std::string file_name = "Ext_table.wav"; //Default value
+std::string tmp = kv("File");
+if (tmp != kv_null) {
+  file_name = tmp;
+  file_name.erase(remove(file_name.begin(), file_name.end(), '"'), file_name.end());
+}
+
+unsigned int fm;
+if (readwav_mono(file_name,fm,tbl) < 0) {
+  cerr << "Error: no se puede leer el fichero " << file_name << " para un instrumento FicTabla" << endl;
+  throw -1;
+}
+~~~~~~
+
+![Señal generada al sintetizar el score "doremi.sco" con `InstrumentExt`](...)
+
+En la gráfica se muestra: el resultado de sintetizar el score "doremi.sco" con `InstrumentExt`.
+
+`InstrumentSamp` es similar a `InstrumentExt` en que también utiliza ficheros externos. Otorgándole una muestra de un instrumento tocando una nota completa este crea su propia tabla de ondas y la utiliza para sintetizar cualquier otra nota. Adicionalmente, se le puede indicar si la muestra es melodica o no (por ejemplo, instrumentos de percusión tienden a ser mucho menos melódicos que el resto), según lo cual se cambiará como se procesan las notas indicadas por el fichero midi.
+
+Según la musicalidad del sample:
+
+~~~~~~{.cpp}
+kv.to_int("Melodic", melodic);
+...
+if(melodic == 0){
+  this->step = 1;
+} else{
+  // Piano sample used plays C4 (261 Hz)
+  this->step = (440/261)*pow(2, (note-69)/12.)*tbl.size()/SamplingRate;
+}
+~~~~~~
+
+![Señal generada al sintetizar el score "doremi.sco" con `InstrumentSamp`](...)
+
+En la gráfica se muestra: el resultado de sintetizar el score "doremi.sco" con `InstrumentSamp`.
+
+**Ficheros de configuración:**
+
+- `work/ext.orc`: `1	InstrumentExt	ADSR_A=0.1; ADSR_D=0.1; ADSR_S=0.5; ADSR_R=0.2; File = "Ext_table.wav";`
+- `work/samp.orc`: `1	InstrumentSamp	ADSR_A=0.1; ADSR_D=0; ADSR_S=1.25; ADSR_R=0.1; File = "piano-trident.wav"; Melodic = 1;`
+
+**Uso:**
+
+~~~~~~{.sh}
+synth ext.orc doremi.sco work/doremi_ext.wav
+synth samp.orc doremi.sco work/seno_samp.wav
+~~~~~~
+
+### Síntesis FM
 
 Construya un instrumento de síntesis FM, según las explicaciones contenidas en el enunciado y el artículo
 de [John M. Chowning](https://web.eecs.umich.edu/~fessler/course/100/misc/chowning-73-tso.pdf). El
@@ -279,7 +337,36 @@ deberá venir expresado en semitonos.
     ejemplo, violines, pianos, percusiones, espadas láser de la
 	[Guerra de las Galaxias](https://www.starwars.com/), etc.
 
-### Orquestación usando el programa synth.
+Se ha implementado el instrumento `InstrumentFM_N1N2` partiendo de `InstrumentSeno`. Este utiliza sintetización FM para modelar la tabla de ondas y el recorrido de esta, permitiendo sintetización de instrumentos con más profundidad (a diferencia de frecuencias puras) según la metodología descrita por John M. Chowing.
+
+**Parámetros utilizados:**
+
+La frecuencia de la nota se obtiene a partir del número de nota MIDI (`note`, siendo el La4=440 Hz
+el valor 69):
+
+    f0 = 440 × 2^{(note - 69) / 12} / SamplingRate
+
+A diferencia de `InstrumentSeno`, `InstrumentFM_N1N2` tiene dos `steps` diferentes, `step1` correspondiente a la carrier frequency, y `step2` correspondiente a la modulation frequency, calculados como:
+
+    step1 = 2 × M_PI × f0 × N1; //carrier frequency step in rad/s
+    step2 = 2 × M_PI × f0 × N2; //modulation frequency step in rad/s
+
+
+**Ficheros de configuración:**
+
+- `work/fm_n1n2.orc`: `1  InstrumentFM_N1N2	ADSR_A=0.02; ADSR_D=0.1; ADSR_S=0.4; ADSR_R=0.1; I=1; N1=2; N2=3; Amp=1;`
+- `work/clarinete.orc`: `1  InstrumentFM_N1N2  ADSR_A=0.1; ADSR_D=0; ADSR_S=0.8; ADSR_R=0.05; I=4; N1=3; N2=2; Amp=1;`
+- `work/campana.orc`: `1  InstrumentFM_N1N2  ADSR_A=0.01; ADSR_D=0.5; ADSR_S=0; ADSR_R=0; I=0; N1=5; N2=7; Amp=1;`
+
+**Uso:**
+
+~~~~~~{.sh}
+synth fm_n1n2.orc doremi.sco work/doremi_fmN1N2.wav
+synth clarinete.orc doremi.sco work/doremi_clarinete.wav
+synth campana.orc doremi.sco work/doremi_campana.wav
+~~~~~~
+
+### Orquestación usando el programa synth
 
 Use el programa `synth` para generar canciones a partir de su partitura MIDI. Como mínimo, deberá incluir la
 *orquestación* de la canción *You've got a friend in me* (fichero `ToyStory_A_Friend_in_me.sco`) del genial
@@ -298,6 +385,13 @@ de su agrado o composición. Se valorará la riqueza instrumental, su modelado y
   `work/music`.
 - Indique, a continuación, la orden necesaria para generar cada una de las señales usando los distintos
   ficheros.
+
+Hemos generado tanto la sintetización de la canción *You've got a friend in me* como de la canción *Uptown Girl* de [Billy Joel]. Para generarlos son necesarias las siguientes ordenes:
+~~~~~~{.sh}
+synth ToyStory_A_Friend_in_me.orc ToyStory_A_Friend_in_me.sco ToyStory_A_Friend_in_me.wav
+synth Uptown_Girl.orc Uptown_Girl.sco Uptown_Girl.wav
+~~~~~~
+
 
 > NOTA:
 >
