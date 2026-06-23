@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include <algorithm>
 #include "instrument_ext.h"
 #include "keyvalue.h"
 #include "wavfile_mono.h"
@@ -19,13 +20,13 @@ InstrumentExt::InstrumentExt(const std::string &param)
     You can use the class keyvalue to parse "param" and configure your instrument.
     Take a Look at keyvalue.h    
   */
-  // Cambiar file_name a nombre del archivo con la tabla externa
   KeyValue kv(param);
-  std::string file_name = "Ext_table.wav"; //Default value
   static string kv_null;
-  if((file_name = kv("file")) == kv_null) {
-    cerr << "Error: no se ha encontrado el campo con el fichero de la señal para un instrumento FicTabla" << endl;
-    throw -1;
+  std::string file_name = "Ext_table.wav"; //Default value
+  std::string tmp = kv("File");
+  if (tmp != kv_null) {
+    file_name = tmp;
+    file_name.erase(remove(file_name.begin(), file_name.end(), '"'), file_name.end());
   }
 
   unsigned int fm;
@@ -63,14 +64,15 @@ const vector<float> & InstrumentExt::synthesize() {
     return x;
 
   for (unsigned int i=0; i<x.size(); ++i) {
-    if (phase > tbl.size()){
-      x[i] = 0;
-      adsr.end();
-    }
+    unsigned int idx0 = (unsigned int) phase;
+    unsigned int idx1 = idx0 + 1;
+    if (idx1 >= tbl.size())
+      idx1 = 0;
+    float frac = phase - idx0;
+    x[i] = A * (tbl[idx0] + frac * (tbl[idx1] - tbl[idx0]));
     phase += step;
-    while(phase >= tbl.size()-0.5){
+    while (phase >= tbl.size())
       phase -= tbl.size();
-    }
   }
   adsr(x); //apply envelope to x and update internal status of ADSR
 
