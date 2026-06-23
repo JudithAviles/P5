@@ -1,10 +1,7 @@
 #include <iostream>
 #include <math.h>
-<<<<<<< HEAD
-=======
 #include <algorithm>
 #include <sndfile.h>
->>>>>>> 1592f1d31581fa3c8f2307bd1c6a4f46bbecc58c
 #include "instrument_samp.h"
 #include "keyvalue.h"
 #include "wavfile_mono.h"
