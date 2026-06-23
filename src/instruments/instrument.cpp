@@ -4,6 +4,10 @@
 #include "instrument_perc.h"
 #include "instrument_plano.h"
 #include "instrument_seno.h"
+#include "instrument_ext.h"
+#include "instrument_samp.h"
+#include "instrument_fm.h"
+#include "instrument_fm_N1N2.h"
 
 /*
   For each new instrument:
@@ -29,6 +33,14 @@ namespace upc {
       pInst = (Instrument *) new InstrumentPlano(parameters);
     } else if (name == "InstrumentSeno") {
       pInst = (Instrument *) new InstrumentSeno(parameters);
+    } else if (name == "InstrumentExt") {
+      pInst = (Instrument *) new InstrumentExt(parameters);
+    } else if (name == "InstrumentSamp") {
+      pInst = (Instrument *) new InstrumentSamp(parameters);
+    } else if (name == "InstrumentFM") {
+      pInst = (Instrument *) new InstrumentFM(parameters);
+    } else if (name == "InstrumentFMN1N2") {
+      pInst = (Instrument *) new InstrumentFM_N1N2(parameters);
     }
     
     return pInst;
