@@ -264,7 +264,7 @@ Por ejemplo, en `tremolo_test.sco`:
 
 ### Síntesis por tabla externa y por sampler
 
-Se han implementado los instrumentos `InstrumentExt` y `InstrumentSamp` partiendo de `InstrumentSeno`. `InstrumentExt` utiliza una tabla externa de valores para su tabla de ondas, y mantiene el resto del proceso de sintetización igual a `InstrumentSeno`. La tabla exterior utilizada modela un periodo de un seno de frecuéncia 1 Hz y amplitud 1, a partir del cual se puede fácilmente sintetizar cualquier nota con los cálculos empleados previamente en `InstrumentSeno`.
+Se han implementado los instrumentos `InstrumentExt` e `InstrumentSamp` partiendo de `InstrumentSeno`. `InstrumentExt` utiliza una tabla externa de valores para su tabla de ondas, y mantiene el resto del proceso de síntesis igual a `InstrumentSeno`. La tabla exterior usada modela un periodo de un seno de frecuencia 1 Hz y amplitud 1, a partir del cual se puede fácilmente sintetizar cualquier nota con los cálculos empleados previamente en `InstrumentSeno`.
 
 Para obtener la información del fichero dado:
 
@@ -289,7 +289,7 @@ if (readwav_mono(file_name,fm,tbl) < 0) {
 
 En la gráfica se muestra: el resultado de sintetizar el score "doremi.sco" con `InstrumentExt`.
 
-`InstrumentSamp` es similar a `InstrumentExt` en que también utiliza ficheros externos. Otorgándole una muestra de un instrumento tocando una nota completa este crea su propia tabla de ondas y la utiliza para sintetizar cualquier otra nota. Adicionalmente, se le puede indicar si la muestra es melodica o no (por ejemplo, instrumentos de percusión tienden a ser mucho menos melódicos que el resto), según lo cual se cambiará como se procesan las notas indicadas por el fichero midi.
+`InstrumentSamp` es similar a `InstrumentExt` en que también utiliza ficheros externos. Otorgándole una muestra de un instrumento tocando una nota completa este crea su propia tabla de ondas y la utiliza para sintetizar cualquier otra nota. Adicionalmente, se le puede indicar si la muestra es melódica o no (por ejemplo, instrumentos de percusión tienden a ser mucho menos melódicos que el resto), según lo cual se cambiará como se procesan las notas indicadas por el fichero Midi.
 
 Según la musicalidad del sample:
 
@@ -337,7 +337,7 @@ deberá venir expresado en semitonos.
     ejemplo, violines, pianos, percusiones, espadas láser de la
 	[Guerra de las Galaxias](https://www.starwars.com/), etc.
 
-Se ha implementado el instrumento `InstrumentFM_N1N2` partiendo de `InstrumentSeno`. Este utiliza sintetización FM para modelar la tabla de ondas y el recorrido de esta, permitiendo sintetización de instrumentos con más profundidad (a diferencia de frecuencias puras) según la metodología descrita por John M. Chowing.
+Se ha implementado el instrumento `InstrumentFM_N1N2` partiendo de `InstrumentSeno`. Este utiliza síntesis FM para modelar la tabla de ondas y el recorrido de esta, permitiendo la síntesis de instrumentos con más profundidad (a diferencia de frecuencias puras) según la metodología descrita por John M. Chowing.
 
 **Parámetros utilizados:**
 
@@ -386,7 +386,16 @@ de su agrado o composición. Se valorará la riqueza instrumental, su modelado y
 - Indique, a continuación, la orden necesaria para generar cada una de las señales usando los distintos
   ficheros.
 
-Hemos generado tanto la sintetización de la canción *You've got a friend in me* como de la canción *Uptown Girl* de [Billy Joel]. Para generarlos son necesarias las siguientes ordenes:
+Hemos generado tanto la sintetización de la canción *You've got a friend in me* como de la canción *Uptown Girl* de [Billy Joel]. Para una mejor experiencia de escucha se ha añadido al instrumento `InstrumentFM_N1N2` la opción de establecer la amplitud máxima de la señal con la opción `Amp`, tal que:
+
+~~~~~~{.cpp}
+kv.to_float("Amp",amp);
+...
+x[i] = amp * A * sin(phase1 + I_lin*sin(phase2));
+~~~~~~
+
+Para generarlos son necesarias las siguientes órdenes:
+
 ~~~~~~{.sh}
 synth ToyStory_A_Friend_in_me.orc ToyStory_A_Friend_in_me.sco ToyStory_A_Friend_in_me.wav
 synth Uptown_Girl.orc Uptown_Girl.sco Uptown_Girl.wav
