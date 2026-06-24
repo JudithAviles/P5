@@ -256,40 +256,137 @@ Por ejemplo, en `tremolo_test.sco`:
 
 ### Síntesis FM.
 
-Construya un instrumento de síntesis FM, según las explicaciones contenidas en el enunciado y el artículo
-de [John M. Chowning](https://web.eecs.umich.edu/~fessler/course/100/misc/chowning-73-tso.pdf). El
-instrumento usará como parámetros **básicos** los números `N1` y `N2`, y el índice de modulación `I`, que
-deberá venir expresado en semitonos.
+Se han implementado dos instrumentos de síntesis FM:
 
-- Use el instrumento para generar un vibrato de *parámetros razonables* e incluya una gráfica en la que se
-  vea, claramente, la correspondencia entre los valores `N1`, `N2` e `I` con la señal obtenida.
-- Use el instrumento para generar un sonido tipo clarinete y otro tipo campana. Tome los parámetros del
-  sonido (N1, N2 e I) y de la envolvente ADSR del citado artículo. Con estos sonidos, genere sendas escalas
-  diatónicas (fichero `doremi.sco`) y ponga el resultado en los ficheros `work/doremi/clarinete.wav` y
-  `work/doremi/campana.work`.
-  * También puede colgar en el directorio work/doremi otras escalas usando sonidos *interesantes*. Por
-    ejemplo, violines, pianos, percusiones, espadas láser de la
-	[Guerra de las Galaxias](https://www.starwars.com/), etc.
+- **`InstrumentFM`**: modulación FM simple con parámetros `I` (índice de modulación) y `fm`
+  (frecuencia moduladora en Hz). La señal se genera como:
+
+  ```
+  x[n] = A · sen(2π·fc·n + I · sen(2π·fm·n))
+  ```
+
+  donde `fc` es la frecuencia fundamental de la nota y `fm` la frecuencia del modulador.
+
+- **`InstrumentFMN1N2`**: modulación FM con relación de frecuencias `N1:N2` (carrier:modulator).
+  Se genera según la ecuación:
+
+  ```
+  x[n] = A · sen(N1·θc[n] + I · sen(N2·θm[n]))
+  ```
+
+  donde `θc = 2π·f0·t` es la fase de la portadora y `θm = 2π·f0·t` la del modulador,
+  escaladas por `N1` y `N2` respectivamente. El índice de modulación `I` determina la
+  cantidad de modulación (expresado en semitonos).
+
+La implementación utiliza dos osciladores digitales con fase acumulativa y `wrap-around`
+a `±π` para evitar overflow:
+
+~~~~~~{.cpp}
+x[i] = A * sin(phase1 + I * sin(phase2));
+phase1 += step1;   // step1 = 2·π·N1·f0/fs
+phase2 += step2;   // step2 = 2·π·N2·f0/fs
+while (phase1 >= M_PI) phase1 -= 2*M_PI;
+while (phase2 >= M_PI) phase2 -= 2*M_PI;
+~~~~~~
+
+**Vibrato FM:**
+
+Usando `N1=N2=1` con un índice pequeño (I=0.5) y frecuencia moduladora sub-audio (fm=5 Hz),
+se obtiene un efecto de vibrato: la frecuencia instantánea oscila alrededor de la frecuencia
+base con una desviación proporcional a `I·fm`. La gráfica siguiente muestra el resultado para
+la nota A4 (440 Hz):
+
+![Señales FM — clarinete, campana y vibrato](work/doremi/fm_signals.png)
+
+**Sonidos de clarinete y campana (Chowning):**
+
+Siguiendo el artículo de Chowning, se usan las siguientes configuraciones:
+
+| Sonido | N1:N2 | I  | ADSR_A | ADSR_D | ADSR_S | ADSR_R | Descripción |
+|--------|-------|----|--------|--------|--------|--------|-------------|
+| Clarinete | 1:3 | 2 | 0.02 | 0.3 | 0.6 | 0.1 | Relación 1:3 con índice moderado |
+| Campana | 1:1.4 | 3 | 0.001 | 1.0 | 0.0 | 1.0 | Relación 1:1.4, campana con extinción lenta |
+
+- **Clarinete** (`work/doremi/clarinete.orc`): N1=1, N2=3, I=2, con ADSR de ataque suave y
+  mantenimiento sostenido. El sonido resultante tiene un timbre similar al clarinete real
+  gracias a la riqueza armónica que aporta la relación 1:3.
+- **Campana** (`work/doremi/campana.orc`): N1=1, N2=1.4 (~7/5), I=3, con ADSR de ataque
+  instantáneo y caída lenta sin sostenimiento. La relación no entera 1:1.4 produce
+  parciales no armónicos que imitan el sonido de campana.
+
+![Escalas diatónicas generadas con FM](work/doremi/fm_doremi_scales.png)
+
+**Generación de los ficheros de audio:**
+
+~~~~~~{.sh}
+# Escala diatónica con sonido de clarinete
+synth work/doremi/clarinete.orc work/doremi/doremi.sco work/doremi/clarinete.wav
+
+# Escala diatónica con sonido de campana
+synth work/doremi/campana.orc work/doremi/doremi.sco work/doremi/campana.wav
+
+# FM vibrato (N1=N2=1, I=0.5, fm=5 Hz)
+synth work/doremi/vibrato_fm.orc work/doremi/vibrato_test.sco work/doremi/vibrato_fm.wav
+~~~~~~
 
 ### Orquestación usando el programa synth.
 
-Use el programa `synth` para generar canciones a partir de su partitura MIDI. Como mínimo, deberá incluir la
-*orquestación* de la canción *You've got a friend in me* (fichero `ToyStory_A_Friend_in_me.sco`) del genial
-[Randy Newman](https://open.spotify.com/artist/3HQyFCFFfJO3KKBlUfZsyW/about).
+Se han orquestado dos canciones usando el programa `synth` con instrumentos de síntesis FM,
+ubicando los ficheros en `work/music/`.
 
-- En este triste arreglo, la pista 1 corresponde al instrumento solista (puede ser un piano, flauta,
-  violín, etc.), y la 2 al bajo (bajo eléctrico, contrabajo, tuba, etc.).
-- Coloque el resultado, junto con los ficheros necesarios para generarlo, en el directorio `work/music`.
-- Indique, a continuación, la orden necesaria para generar la señal (suponiendo que todos los archivos
-  necesarios están en el directorio indicado).
+#### Toy Story — You've Got a Friend in Me
 
-También puede orquestar otros temas más complejos, como la banda sonora de *Hawaii5-0* o el villacinco de
-John Lennon *Happy Xmas (War Is Over)* (fichero `The_Christmas_Song_Lennon.sco`), o cualquier otra canción
-de su agrado o composición. Se valorará la riqueza instrumental, su modelado y el resultado final.
-- Coloque los ficheros generados, junto a sus ficheros `score`, `instruments` y `efffects`, en el directorio
-  `work/music`.
-- Indique, a continuación, la orden necesaria para generar cada una de las señales usando los distintos
-  ficheros.
+El arreglo dispone de dos pistas:
+- **Pista 1** (solista, notas MIDI 55–79): `InstrumentFMN1N2` con parámetros de piano FM
+  (N1=1, N2=2, I=0.5, ADSR rápido). La relación 1:2 proporciona un timbre brillante
+  adecuado para la melodía principal.
+- **Pista 2** (bajo, notas MIDI 34–65): `InstrumentFMN1N2` con parámetros de bajo FM
+  (N1=1, N2=1, I=1, ADSR sostenido). La relación 1:1 con índice bajo produce un sonido
+  grave y estable para el acompañamiento.
+
+Fichero de instrumentos (`work/music/toystory.orc`):
+```
+1	InstrumentFMN1N2	ADSR_A=0.01; ADSR_D=0.1; ADSR_S=0.7; ADSR_R=0.1; I=0.5; N1=1; N2=2;
+2	InstrumentFMN1N2	ADSR_A=0.05; ADSR_D=0.2; ADSR_S=0.8; ADSR_R=0.2; I=1; N1=1; N2=1;
+```
+
+Generación:
+~~~~~~{.sh}
+synth work/music/toystory.orc samples/ToyStory_A_Friend_in_me.sco work/music/toystory.wav
+~~~~~~
+
+También se ofrece una versión alternativa con piano (`InstrumentPlano`) para la melodía:
+~~~~~~{.sh}
+synth work/music/toystory_alt.orc samples/ToyStory_A_Friend_in_me.sco work/music/toystory_alt.wav
+~~~~~~
+
+#### Hawaii Five-O
+
+La partitura MIDI de *Hawaii Five-O* se ha convertido a formato `.sco` usando la utilidad
+`midi2sco.py` con tempo original (bpm=163, tpb=120). La orquestación consta de 16 canales:
+
+| Canal | Instrumento | Parámetros FM |
+|-------|-------------|---------------|
+| 1–7 | Percusión (`InstrumentPerc`) | ADSR percusivo según el tipo |
+| 8 | Bajo | N1=1, N2=1, I=5 |
+| 9 | Guitarra | N1=1, N2=2, I=1 |
+| 10 | Brass | N1=1, N2=3, I=1.5 |
+| 11 | Hard brass | N1=1, N2=3, I=2 |
+| 12–13 | Flautas | N1=1, N2=4, I=0.3 |
+| 14–15 | Trombones | N1=1, N2=2, I=2 |
+| 16 | Hard brass 2 | N1=1, N2=3, I=2 |
+
+Fichero de instrumentos (`work/music/hawaii50.orc`):
+~~~~~~
+1	InstrumentPerc	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1;
+...
+16	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0.2; ADSR_S=0.7; ADSR_R=0.1; I=2; N1=1; N2=3;
+~~~~~~
+
+Generación:
+~~~~~~{.sh}
+synth -b 163 -t 120 work/music/hawaii50.orc work/music/hawaii50.sco work/music/hawaii50.wav
+~~~~~~
 
 > NOTA:
 >
