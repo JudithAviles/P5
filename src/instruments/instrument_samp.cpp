@@ -23,13 +23,22 @@ InstrumentSamp::InstrumentSamp(const std::string &param)
   */
   KeyValue kv(param);
   static string kv_null;
-  std::string file_name = "piano-trident.wav"; //Default value
+  std::string file_name = "Drum.wav"; //Default value
   std::string tmp = kv("File");
   if (tmp != kv_null) {
     file_name = tmp;
     file_name.erase(remove(file_name.begin(), file_name.end(), '"'), file_name.end());
   }
+  kv.to_int("Melodic", melodic);
 
+  
+  unsigned int fm;
+  if (readwav_mono(file_name,fm,tbl) < 0) {
+    cerr << "Error: no se puede leer el fichero " << file_name << " para un instrumento FicTabla" << endl;
+    throw -1;
+  }
+
+  /*
   SNDFILE *sndfile_in;
   SF_INFO sf_info;
   sndfile_in = sf_open(file_name.c_str(), SFM_READ, &sf_info);
@@ -50,7 +59,7 @@ InstrumentSamp::InstrumentSamp(const std::string &param)
       tbl[i] = sum / sf_info.channels;
     }
   }
-  sf_close(sndfile_in);
+  sf_close(sndfile_in);*/
 }
 
 
@@ -58,16 +67,21 @@ void InstrumentSamp::command(long cmd, long note, long vel) {
   if (cmd == 9) {		//'Key' pressed: attack begins
     bActive = true;
     adsr.start();
+    A = vel / 127.;
     // Recorremos la tabla muestra a muestra independientemente del pitch (percussión) (sampler)
-    // Para instrumentos melódicos deberíamos mirar como hacer para cambiar el pitch de la ntoa según la que ya se tiene o tener más de una tabla
     this->phase = 0;
-    this->step = 1;
+    if(melodic == 0){
+      this->step = 1;
+    } else{
+      // Piano sample used plays C4 (261 Hz)
+      this->step = (440/261)*pow(2, (note-69)/12.)*tbl.size()/SamplingRate;
+    }
   }
-  else if (cmd == 8) {	//'Key' released: sustain ends, release begins
-    // Sin efecto, el final de la nota se produce cuando llegamos al final de la tabla
+  else if (cmd == 8) {
+    adsr.stop();
   }
-  else if (cmd == 0) {	//Sound extinguished without waiting for release to end
-    // Sin efecto, el final de la nota se produce cuando llegamos al final de la tabla
+  else if (cmd == 0) {
+    adsr.end();
   }
 }
 
@@ -82,15 +96,11 @@ const vector<float> & InstrumentSamp::synthesize() {
     return x;
 
   for (unsigned int i=0; i<x.size(); ++i) {
-    unsigned int idx = (unsigned int) phase;
-    if (idx >= tbl.size()) {
-      x[i] = 0;
-      adsr.end();
-      bActive = false;
-      continue;
-    }
-    x[i] = A * tbl[idx];
+    x[i] = A * tbl[(int) phase+0.5];
     phase += step;
+    while(phase >= tbl.size()-0.5){
+      phase -= tbl.size();
+    }
   }
   adsr(x); //apply envelope to x and update internal status of ADSR
 

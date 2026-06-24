@@ -1,3 +1,4 @@
 /build/
 handover.md
 work/*.wav
+/.venv/

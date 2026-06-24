@@ -11,6 +11,7 @@ namespace upc {
     EnvelopeADSR adsr;
     float phase, step;
 	float A;
+  int melodic;
     std::vector<float> tbl;
   public:
     InstrumentSamp(const std::string &param = "");

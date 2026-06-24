@@ -4,8 +4,6 @@ sources = [
 	'instruments/instrument.cpp',
 	'instruments/instrument_dumb.cpp',
 	'instruments/instrument_clar.cpp',
-	'instruments/instrument_perc.cpp',
-	'instruments/instrument_plano.cpp',
 	'instruments/instrument_seno.cpp',
 	'instruments/instrument_ext.cpp',
 	'instruments/instrument_samp.cpp',

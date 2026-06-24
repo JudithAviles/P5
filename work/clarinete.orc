@@ -1,0 +1,1 @@
+1	InstrumentFMN1N2	ADSR_A=0.1; ADSR_D=0; ADSR_S=0.8; ADSR_R=0.05; I=4; N1=3; N2=2; Amp=1;

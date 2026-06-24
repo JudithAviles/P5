@@ -10,7 +10,7 @@ namespace upc {
   class InstrumentFM_N1N2: public upc::Instrument {
     EnvelopeADSR adsr;
     float I, N1, N2;
-	float A;
+	float A, amp;
   float phase1, phase2, step1, step2;
     std::vector<float> tbl;
   public:

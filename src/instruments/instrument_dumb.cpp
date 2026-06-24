@@ -8,6 +8,7 @@
 using namespace upc;
 using namespace std;
 
+// Llamado instrument dumb pero implementa seno
 //param = cadena de parametros del instrument
 InstrumentDumb::InstrumentDumb(const std::string &param) 
   : adsr(SamplingRate, param) {
@@ -43,10 +44,9 @@ void InstrumentDumb::command(long cmd, long note, long vel) {
     adsr.start();
     // Indicamos como queremos que recorra la tabla --> Que nota debe tocar
     // Por ahora, para frecuencias múltiples decimales (no coincide exactamente con las muestras que tenemos en la tabla)
-    // Utilizaremos la muestra más cercana a la que relamente queremos
-    // Para mejorar el código podríamos interpolar para obtener una mejor muestra
+    // Utilizaremos la muestra más cercana a la que relamente queremos --> Interpolamos
 	  A = vel / 127.;
-    phase = 0;
+    this->phase = 0;
     this->step = 440*pow(2, (note-69)/12.)*tbl.size()/SamplingRate;
   }
   else if (cmd == 8) {	//'Key' released: sustain ends, release begins
@@ -67,8 +67,15 @@ const vector<float> & InstrumentDumb::synthesize() {
   else if (not bActive)
     return x;
 
+  // Para mejorar el código podríamos interpolar para obtener una mejor muestra
   for (unsigned int i=0; i<x.size(); ++i) {
-    x[i] = A * tbl[(int) phase+0.5];
+    x[i] = A * tbl[(int) (phase+0.5)];
+    /*float fact = phase - (int) phase;
+    if (ceil(phase) > tbl.size() || floor(phase) == tbl.size()){
+      x[i] = A * ((1-fact)*tbl[floor(phase)]+fact*tbl[0]);
+    } else{
+      x[i] = A * ((1-fact)*tbl[floor(phase)]+fact*tbl[ceil(phase)]);
+    }*/
     phase += step;
     while(phase >= tbl.size()-0.5){
       phase -= tbl.size();

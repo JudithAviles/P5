@@ -14,6 +14,7 @@ InstrumentFM_N1N2::InstrumentFM_N1N2(const std::string &param)
   x.resize(BSIZE);
   KeyValue kv(param);
 
+  kv.to_float("Amp",amp);
   if (!kv.to_float("I",I))
     I = 1; //default value
   if (!kv.to_float("N1",N1))
@@ -53,8 +54,9 @@ const vector<float> & InstrumentFM_N1N2::synthesize() {
   else if (not bActive)
     return x;
 
+  float I_lin = 1 - pow(2,(-I/12));
   for (unsigned int i=0; i<x.size(); ++i) {
-    x[i] = A * sin(phase1 + I*sin(phase2));
+    x[i] = amp * A * sin(phase1 + I_lin*sin(phase2));
     phase1 += step1;
     phase2 += step2;
     while(phase1 >= M_PI){
