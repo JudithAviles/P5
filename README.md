@@ -296,7 +296,7 @@ if(melodic == 0){
 
 ![Señal generada al sintetizar el score "doremi.sco" con `InstrumentSamp`](piano-trident.png)
 
-![Señal generada al sintetizar el score "doremi.sco" con `InstrumentSamp`](ADSR_samp.png)
+![Señal generada al sintetizar el score "doremi.sco" con `InstrumentSamp`](ASDR_samp.png)
 
 En las gráficas se muestran: el sample de piano utilizado para la síntesis (de la nota C4, 261 Hz) y el resultado de sintetizar el score "doremi.sco" con `InstrumentSamp`.
 
