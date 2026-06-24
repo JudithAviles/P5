@@ -14,13 +14,14 @@ InstrumentFM_N1N2::InstrumentFM_N1N2(const std::string &param)
   x.resize(BSIZE);
   KeyValue kv(param);
 
-  kv.to_float("Amp",amp);
   if (!kv.to_float("I",I))
     I = 1; //default value
   if (!kv.to_float("N1",N1))
     N1 = 1; //default value
   if (!kv.to_float("N2",N2))
     N2 = 1; //default value
+  if (!kv.to_float("Amp",amp))
+    amp = 1; //default value
 }
 
 

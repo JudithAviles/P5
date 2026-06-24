@@ -56,18 +56,6 @@ Los ficheros de configuración utilizados son:
 **Curvas ADSR de los cuatro instrumentos**
 ![Curvas ADSR de los cuatro instrumentos](work/adsr_envelopes.png)
 
-**ADSR Genérica**
-![ADSR Genèrica](ADSR_clar.png)
-
-**ADSR Percusión pulsada**
-![ADSR Percussió pulsada](ADSR_perc_sostinguda.png)
-
-**ADSR Percusión finalizada**
-![ADSR Percussió finalitzada](ADSR_perc_acabada.png)
-
-**ADSR Flauta**
-![ADSR Flauta](ADSR_flauta.png)
-
 **Interpretación de las gráficas:**
 
 1. **ADSR Genérica (InstrumentClar):** Se aprecian claramente las cuatro fases. Tras el
@@ -285,9 +273,11 @@ if (readwav_mono(file_name,fm,tbl) < 0) {
 }
 ~~~~~~
 
-![Señal generada al sintetizar el score "doremi.sco" con `InstrumentExt`](...)
+![Tabla externa utilizada para `InstrumentExt`](Ext_table.png)
 
-En la gráfica se muestra: el resultado de sintetizar el score "doremi.sco" con `InstrumentExt`.
+![Señal generada al sintetizar el score "doremi.sco" con `InstrumentExt`](ASDR_Ext.png)
+
+En las gráficas se muestran: la tabla externa utilizada para la síntesis y el resultado de sintetizar el score "doremi.sco" con `InstrumentExt`.
 
 `InstrumentSamp` es similar a `InstrumentExt` en que también utiliza ficheros externos. Otorgándole una muestra de un instrumento tocando una nota completa este crea su propia tabla de ondas y la utiliza para sintetizar cualquier otra nota. Adicionalmente, se le puede indicar si la muestra es melódica o no (por ejemplo, instrumentos de percusión tienden a ser mucho menos melódicos que el resto), según lo cual se cambiará como se procesan las notas indicadas por el fichero Midi.
 
@@ -304,9 +294,11 @@ if(melodic == 0){
 }
 ~~~~~~
 
-![Señal generada al sintetizar el score "doremi.sco" con `InstrumentSamp`](...)
+![Señal generada al sintetizar el score "doremi.sco" con `InstrumentSamp`](piano-trident.png)
 
-En la gráfica se muestra: el resultado de sintetizar el score "doremi.sco" con `InstrumentSamp`.
+![Señal generada al sintetizar el score "doremi.sco" con `InstrumentSamp`](ADSR_samp.png)
+
+En las gráficas se muestran: el sample de piano utilizado para la síntesis (de la nota C4, 261 Hz) y el resultado de sintetizar el score "doremi.sco" con `InstrumentSamp`.
 
 **Ficheros de configuración:**
 
@@ -343,6 +335,11 @@ Se han implementado dos instrumentos de síntesis FM:
   donde `θc = 2π·f0·t` es la fase de la portadora y `θm = 2π·f0·t` la del modulador,
   escaladas por `N1` y `N2` respectivamente. El índice de modulación `I` determina la
   cantidad de modulación (expresado en semitonos).
+
+A diferencia de `InstrumentSeno`, `InstrumentFM_N1N2` tiene dos `steps` diferentes, `step1` correspondiente a la carrier frequency, y `step2` correspondiente a la modulation frequency, calculados como:
+
+    step1 = 2 × M_PI × f0 × N1; //carrier frequency step in rad/s
+    step2 = 2 × M_PI × f0 × N2; //modulation frequency step in rad/s
 
 La implementación utiliza dos osciladores digitales con fase acumulativa y `wrap-around`
 a `±π` para evitar overflow:
@@ -395,34 +392,11 @@ synth work/doremi/campana.orc work/doremi/doremi.sco work/doremi/campana.wav
 synth work/doremi/vibrato_fm.orc work/doremi/vibrato_test.sco work/doremi/vibrato_fm.wav
 ~~~~~~
 
-Se ha implementado el instrumento `InstrumentFM_N1N2` partiendo de `InstrumentSeno`. Este utiliza síntesis FM para modelar la tabla de ondas y el recorrido de esta, permitiendo la síntesis de instrumentos con más profundidad (a diferencia de frecuencias puras) según la metodología descrita por John M. Chowing.
-
-**Parámetros utilizados:**
-
-La frecuencia de la nota se obtiene a partir del número de nota MIDI (`note`, siendo el La4=440 Hz
-el valor 69):
-
-    f0 = 440 × 2^{(note - 69) / 12} / SamplingRate
-
-A diferencia de `InstrumentSeno`, `InstrumentFM_N1N2` tiene dos `steps` diferentes, `step1` correspondiente a la carrier frequency, y `step2` correspondiente a la modulation frequency, calculados como:
-
-    step1 = 2 × M_PI × f0 × N1; //carrier frequency step in rad/s
-    step2 = 2 × M_PI × f0 × N2; //modulation frequency step in rad/s
-
-
 **Ficheros de configuración:**
 
 - `work/fm_n1n2.orc`: `1  InstrumentFM_N1N2	ADSR_A=0.02; ADSR_D=0.1; ADSR_S=0.4; ADSR_R=0.1; I=1; N1=2; N2=3; Amp=1;`
 - `work/clarinete.orc`: `1  InstrumentFM_N1N2  ADSR_A=0.1; ADSR_D=0; ADSR_S=0.8; ADSR_R=0.05; I=4; N1=3; N2=2; Amp=1;`
 - `work/campana.orc`: `1  InstrumentFM_N1N2  ADSR_A=0.01; ADSR_D=0.5; ADSR_S=0; ADSR_R=0; I=0; N1=5; N2=7; Amp=1;`
-
-**Uso:**
-
-~~~~~~{.sh}
-synth fm_n1n2.orc doremi.sco work/doremi_fmN1N2.wav
-synth clarinete.orc doremi.sco work/doremi_clarinete.wav
-synth campana.orc doremi.sco work/doremi_campana.wav
-~~~~~~
 
 ### Orquestación usando el programa synth
 
@@ -483,21 +457,41 @@ Generación:
 synth -b 163 -t 120 work/music/hawaii50.orc work/music/hawaii50.sco work/music/hawaii50.wav
 ~~~~~~
 
-Hemos generado tanto la sintetización de la canción *You've got a friend in me* como de la canción *Uptown Girl* de [Billy Joel]. Para una mejor experiencia de escucha se ha añadido al instrumento `InstrumentFM_N1N2` la opción de establecer la amplitud máxima de la señal con la opción `Amp`, tal que:
+#### Uptown Girl - Billy Joel
 
-~~~~~~{.cpp}
-kv.to_float("Amp",amp);
-...
-x[i] = amp * A * sin(phase1 + I_lin*sin(phase2));
-~~~~~~
+El arreglo dispone de 8 pistas:
+- **Pista 1** (placeholder): `InstrumentFMN1N2` con parámetros default
+- **Pista 2** (vocal): `InstrumentFMN1N2` con parámetros imitando la dimensionalidad de la voz
+  (N1=1, N2=1, I=2, ADSR decayente).
+- **Pista 3** (muted guitar): `InstrumentFMN1N2` con parámetros de cuerda FM
+  (N1=3, N2=2, I=0, ADSR sostenido).
+- **Pista 4** (backing vocals): `InstrumentFMN1N2` con parámetros similares a la vocal principal
+  (N1=1, N2=1, I=2, ADSR sostenido).
+- **Pista 5** (piano 1): `InstrumentFMN1N2` con parámetros de piano con timbre FM
+  (N1=4, N2=3, I=2, ADSR rápido).
+- **Pista 6** (piano 2): `InstrumentFMN1N2` con parámetros de piano con timbre FM
+  (N1=4, N2=3, I=2, ADSR rápido).
+- **Pista 7** (bajista): `InstrumentFMN1N2` con parámetros de bajo FM
+  (N1=1, N2=1, I=0, ADSR sostenido).
+- **Pista 8** (ritmo&SE): `InstrumentFMN1N2` con parámetros de percusión FM
+  (N1=5, N2=3, I=1, ADSR rápido).
 
-Para generarlos son necesarias las siguientes órdenes:
+Fichero de instrumentos (`work/music/Uptown_Girl.orc`):
+```
+1	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0.1; ADSR_S=0.4; ADSR_R=0.1; I=1; N1=2; N2=3; Amp = 0.3;
+2	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0.2; ADSR_S=0.1; ADSR_R=0.4; I=2; N1=1; N2=1; Amp = 0.2;
+3	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0; ADSR_S=0.4; ADSR_R=0.2; I=0; N1=3; N2=2; Amp = 0.3;
+4	InstrumentFMN1N2	ADSR_A=0.06; ADSR_D=0.15; ADSR_S=0.25; ADSR_R=0.1; I=2; N1=1; N2=1; Amp = 0.4;
+5	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0.1; ADSR_S=0.4; ADSR_R=0.1; I=2; N1=4; N2=3; Amp = 0.3;
+6	InstrumentFMN1N2	ADSR_A=0.1; ADSR_D=0.05; ADSR_S=0.3; ADSR_R=0.3; I=2; N1=4; N2=3; Amp = 0.3;
+7	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0; ADSR_S=0.4; ADSR_R=0.3; I=0; N1=1; N2=1; Amp = 0.3;
+8	InstrumentFMN1N2	ADSR_A=0.05; ADSR_D=0.05; ADSR_S=0.3; ADSR_R=0.2; I=0; N1=5; N2=3; Amp = 0.3;
+```
 
+Generación:
 ~~~~~~{.sh}
-synth ToyStory_A_Friend_in_me.orc ToyStory_A_Friend_in_me.sco ToyStory_A_Friend_in_me.wav
-synth Uptown_Girl.orc Uptown_Girl.sco Uptown_Girl.wav
+synth work/music/Uptown_Girl.orc work/music/Uptown_Girl.sco work/music/Uptown_Girl.wav
 ~~~~~~
-
 
 > NOTA:
 >
