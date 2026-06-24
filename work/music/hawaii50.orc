@@ -1,10 +1,10 @@
-1	InstrumentPerc	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1;
-2	InstrumentPerc	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1;
-3	InstrumentPerc	ADSR_A=0.001; ADSR_D=0.1; ADSR_S=0; ADSR_R=0.05;
-4	InstrumentPerc	ADSR_A=0.001; ADSR_D=1.0; ADSR_S=0; ADSR_R=1.0;
-5	InstrumentPerc	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1;
-6	InstrumentPerc	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1;
-7	InstrumentPerc	ADSR_A=0.001; ADSR_D=0.1; ADSR_S=0; ADSR_R=0.05;
+1	InstrumentDumb	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1; N=40;
+2	InstrumentDumb	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1; N=40;
+3	InstrumentDumb	ADSR_A=0.001; ADSR_D=0.1; ADSR_S=0; ADSR_R=0.05; N=40;
+4	InstrumentDumb	ADSR_A=0.001; ADSR_D=1.0; ADSR_S=0; ADSR_R=1.0; N=40;
+5	InstrumentDumb	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1; N=40;
+6	InstrumentDumb	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1; N=40;
+7	InstrumentDumb	ADSR_A=0.001; ADSR_D=0.1; ADSR_S=0; ADSR_R=0.05; N=40;
 8	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0.3; ADSR_S=0.7; ADSR_R=0.2; I=5; N1=1; N2=1;
 9	InstrumentFMN1N2	ADSR_A=0.01; ADSR_D=0.2; ADSR_S=0.5; ADSR_R=0.1; I=1; N1=1; N2=2;
 10	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0.2; ADSR_S=0.7; ADSR_R=0.1; I=1.5; N1=1; N2=3;

@@ -30,8 +30,8 @@ de `Instrument` y utiliza `EnvelopeADSR` para la generación de la envolvente te
 |-------------|--------|--------|--------|--------|-------------|
 | `InstrumentDumb` | 0.002 | 0.1 | 0.0 | 0.05 | Percusivo simple |
 | `InstrumentClar` | 0.1 | 0.3 | 0.5 | 0.4 | ADSR genérica — todas las fases visibles |
-| `InstrumentPerc` | 0.001 | 0.5 | 0.0 | 1.0 | Percusivo — ataque muy rápido, sin mantenimiento |
-| `InstrumentPlano` | 0.01 | 0.0 | 0.8 | 0.05 | Plano — ataque rápido, alto sostenido, liberación rápida |
+| `InstrumentSeno` (Perc) | 0.001 | 0.5 | 0.0 | 1.0 | Percusivo — ataque muy rápido, sin mantenimiento |
+| `InstrumentSeno` (Plano) | 0.01 | 0.0 | 0.8 | 0.05 | Plano — ataque rápido, alto sostenido, liberación rápida |
 
 Las curvas ADSR se generan mediante la clase `EnvelopeADSR`, que construye vectores de
 amplitud para las fases de *attack* y *release*:
@@ -74,17 +74,17 @@ Los ficheros de configuración utilizados son:
    ataque de 0.1 s, la caída de 0.3 s hasta el mantenimiento en 0.5. El *NoteOff* (línea
    roja discontinua) se produce en t=0.8 s, iniciando la liberación de 0.4 s.
 
-2. **Percusivo — mantenido hasta extinción (InstrumentPerc):** Ataque casi instantáneo
+2. **Percusivo — mantenido hasta extinción (`InstrumentSeno` con ADSR percusivo):** Ataque casi instantáneo
    (0.001 s), seguido de una caída de 0.5 s hasta S=0. El intérprete mantiene la nota
    pulsada durante toda la extinción: el *NoteOff* se produce cuando el sonido ya ha
    desaparecido.
 
-3. **Percusivo — liberación anticipada (InstrumentPerc):** Mismos parámetros ADSR, pero el
+3. **Percusivo — liberación anticipada (`InstrumentSeno` con ADSR percusivo):** Mismos parámetros ADSR, pero el
    intérprete suelta la tecla en t=0.2 s (flecha roja), cuando aún hay sonido en la fase
    de caída. Se inicia entonces la liberación desde el nivel actual, produciendo una
    disminución más abrupta.
 
-4. **Plano (InstrumentPlano):** Ataque rápido (0.01 s), sin caída (D=0), sostenido alto
+4. **Plano (`InstrumentSeno` con ADSR tipo plano):** Ataque rápido (0.01 s), sin caída (D=0), sostenido alto
    (S=0.8) y liberación rápida (0.05 s). Tras el *NoteOff* en t=0.8 s, la amplitud cae a
    cero casi instantáneamente.
 
@@ -447,12 +447,12 @@ Fichero de instrumentos (`work/music/toystory.orc`):
 
 Generación:
 ~~~~~~{.sh}
-synth work/music/toystory.orc samples/ToyStory_A_Friend_in_me.sco work/music/toystory.wav
+synth work/music/toystory.orc work/music/ToyStory_A_Friend_in_me.sco work/music/toystory.wav
 ~~~~~~
 
-También se ofrece una versión alternativa con piano (`InstrumentPlano`) para la melodía:
+También se ofrece una versión alternativa con piano (`InstrumentSeno` con ADSR tipo plano) para la melodía:
 ~~~~~~{.sh}
-synth work/music/toystory_alt.orc samples/ToyStory_A_Friend_in_me.sco work/music/toystory_alt.wav
+synth work/music/toystory_alt.orc work/music/ToyStory_A_Friend_in_me.sco work/music/toystory_alt.wav
 ~~~~~~
 
 #### Hawaii Five-O
@@ -462,7 +462,7 @@ La partitura MIDI de *Hawaii Five-O* se ha convertido a formato `.sco` usando la
 
 | Canal | Instrumento | Parámetros FM |
 |-------|-------------|---------------|
-| 1–7 | Percusión (`InstrumentPerc`) | ADSR percusivo según el tipo |
+| 1–7 | Percusión (`InstrumentDumb`) | ADSR percusivo según el tipo |
 | 8 | Bajo | N1=1, N2=1, I=5 |
 | 9 | Guitarra | N1=1, N2=2, I=1 |
 | 10 | Brass | N1=1, N2=3, I=1.5 |
@@ -473,7 +473,7 @@ La partitura MIDI de *Hawaii Five-O* se ha convertido a formato `.sco` usando la
 
 Fichero de instrumentos (`work/music/hawaii50.orc`):
 ~~~~~~
-1	InstrumentPerc	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1;
+1	InstrumentDumb	ADSR_A=0.001; ADSR_D=0.3; ADSR_S=0; ADSR_R=0.1; N=40;
 ...
 16	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0.2; ADSR_S=0.7; ADSR_R=0.1; I=2; N1=1; N2=3;
 ~~~~~~

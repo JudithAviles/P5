@@ -1,2 +1,2 @@
-1	InstrumentPlano	ADSR_A=0.01; ADSR_D=0.0; ADSR_S=0.8; ADSR_R=0.05; N=40;
+1	InstrumentSeno	ADSR_A=0.01; ADSR_D=0.0; ADSR_S=0.8; ADSR_R=0.05; N=40;
 2	InstrumentFMN1N2	ADSR_A=0.02; ADSR_D=0.3; ADSR_S=0.6; ADSR_R=0.3; I=3; N1=1; N2=1;
